@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { getWeekDates, formatLocalDate, getDayPlan } from '../data/weekOnePlan'
+import { usePlan } from '../contexts/PlanContext'
+import { getWeekDates, formatLocalDate } from '../data/weekOnePlan'
 
 const DAY_ABBREV   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const MONTH_ABBREV = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -12,6 +13,7 @@ const TYPE_BADGE = {
 }
 
 export default function WeeklySummary() {
+  const { getDayPlan } = usePlan()
   const today      = new Date()
   const todayStr   = formatLocalDate(today)
   const weekDates  = getWeekDates(today)

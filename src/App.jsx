@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PlanProvider } from './contexts/PlanContext'
 import TodayView from './components/TodayView'
 import FoodLog from './components/FoodLog'
 import WeeklySummary from './components/WeeklySummary'
@@ -58,6 +59,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('today')
 
   return (
+    <PlanProvider>
     <div className="min-h-screen bg-gray-950">
       <div className="max-w-lg mx-auto bg-gray-900 min-h-screen relative">
 
@@ -92,5 +94,6 @@ export default function App() {
 
       </div>
     </div>
+    </PlanProvider>
   )
 }

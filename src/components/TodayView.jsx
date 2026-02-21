@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { getDayPlan, formatLocalDate } from '../data/weekOnePlan'
+import { usePlan } from '../contexts/PlanContext'
+import { formatLocalDate } from '../data/weekOnePlan'
 
 const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -38,6 +39,7 @@ function CheckCircle({ checked, popping }) {
 }
 
 export default function TodayView() {
+  const { getDayPlan } = usePlan()
   const today    = new Date()
   const todayStr = formatLocalDate(today)
   const dayPlan  = getDayPlan(today)

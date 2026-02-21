@@ -1,4 +1,4 @@
-import { WEEKLY_PLAN } from '../data/weekOnePlan'
+import { usePlan } from '../contexts/PlanContext'
 
 const DAY_KEYS  = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -37,12 +37,14 @@ const LEGEND = [
 ]
 
 export default function PlanView() {
+  const { weeklyPlan, planName } = usePlan()
+
   return (
     <div className="p-4 space-y-4">
 
       {/* Header */}
       <div className="pt-4">
-        <h1 className="text-2xl font-bold text-gray-100">Week One Plan</h1>
+        <h1 className="text-2xl font-bold text-gray-100">{planName}</h1>
         <p className="text-gray-500 text-sm mt-0.5">Your current weekly program</p>
       </div>
 
@@ -59,7 +61,7 @@ export default function PlanView() {
       {/* Day cards */}
       <div className="space-y-3 pb-4">
         {DAY_KEYS.map((dayKey, i) => {
-          const plan  = WEEKLY_PLAN[dayKey]
+          const plan  = weeklyPlan[dayKey]
           const style = TYPE_STYLE[plan.type]
 
           return (
