@@ -83,6 +83,7 @@ export default function WeeklySummary() {
 
   const handleCopyCheckin = async () => {
     setCopying(true)
+    try {
 
     // Fetch food entries with full text for the week
     const { data: foodEntries } = await supabase
@@ -151,10 +152,37 @@ export default function WeeklySummary() {
     lines.push(`Food logged:   ${foodDays} / ${pastDates.length} days`)
     lines.push(`Checklist:     ${itemsDone} / ${itemsTotal} items`)
 
-    await navigator.clipboard.writeText(lines.join('\n'))
+    const text = lines.join('\n')
+    let success = false
+    try {
+      await navigator.clipboard.writeText(text)
+      success = true
+    } catch {
+      // Fallback for iOS Safari when clipboard API is unavailable
+      try {
+        const el = document.createElement('textarea')
+        el.value = text
+        el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;'
+        document.body.appendChild(el)
+        el.focus()
+        el.select()
+        success = document.execCommand('copy')
+        document.body.removeChild(el)
+      } catch {
+        success = false
+      }
+    }
+
     setCopying(false)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2500)
+    if (success) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    }
+
+    } catch (err) {
+      console.error('Check-in copy failed:', err)
+      setCopying(false)
+    }
   }
 
   return (
