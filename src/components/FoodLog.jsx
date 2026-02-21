@@ -54,7 +54,6 @@ export default function FoodLog() {
   }
 
   const handleKeyDown = (e) => {
-    // Cmd+Enter or Ctrl+Enter to submit
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       handleSubmit(e)
     }
@@ -65,8 +64,8 @@ export default function FoodLog() {
 
       {/* Header */}
       <div className="pt-4">
-        <h1 className="text-2xl font-bold text-gray-900">Food Log</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Just type what you ate — no tracking, no judgment</p>
+        <h1 className="text-2xl font-bold text-gray-100">Food Log</h1>
+        <p className="text-gray-500 text-sm mt-0.5">Just type what you ate — no tracking, no judgment</p>
       </div>
 
       {/* Entry form */}
@@ -78,32 +77,32 @@ export default function FoodLog() {
           onKeyDown={handleKeyDown}
           placeholder="e.g. two eggs and toast, glass of OJ…"
           rows={3}
-          className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:outline-none resize-none text-gray-800 placeholder-gray-300 text-base transition-colors"
+          className="w-full p-4 rounded-xl border-2 border-gray-700 bg-gray-800 focus:border-emerald-600 focus:outline-none resize-none text-gray-100 placeholder-gray-600 text-base transition-colors"
         />
         <button
           type="submit"
           disabled={!inputText.trim() || submitting}
-          className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 active:scale-95 disabled:bg-gray-100 disabled:text-gray-300 text-white font-semibold rounded-xl transition-all duration-150"
+          className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 disabled:bg-gray-800 disabled:text-gray-600 text-white font-semibold rounded-xl transition-all duration-150"
         >
           {submitting ? 'Logging…' : 'Log it'}
         </button>
-        <p className="text-center text-xs text-gray-300">⌘ + Enter to submit</p>
+        <p className="text-center text-xs text-gray-700">⌘ + Enter to submit</p>
       </form>
 
       {/* Today's entries */}
       <div>
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">
           Today's entries
         </h2>
 
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map(i => (
-              <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-16 bg-gray-700 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : entries.length === 0 ? (
-          <div className="text-center py-12 text-gray-300">
+          <div className="text-center py-12 text-gray-600">
             <p className="text-5xl mb-3">🍽️</p>
             <p className="text-sm">Nothing logged yet today</p>
           </div>
@@ -112,10 +111,10 @@ export default function FoodLog() {
             {entries.map((entry, i) => (
               <div
                 key={entry.id}
-                className={`bg-white rounded-xl border border-gray-100 p-4 ${i === 0 ? 'slide-in' : ''}`}
+                className={`bg-gray-800 rounded-xl border border-gray-700 p-4 ${i === 0 ? 'slide-in' : ''}`}
               >
-                <p className="text-gray-800 text-base leading-relaxed">{entry.entry_text}</p>
-                <p className="text-gray-300 text-xs mt-2">{formatTime(entry.logged_at)}</p>
+                <p className="text-gray-100 text-base leading-relaxed">{entry.entry_text}</p>
+                <p className="text-gray-600 text-xs mt-2">{formatTime(entry.logged_at)}</p>
               </div>
             ))}
           </div>

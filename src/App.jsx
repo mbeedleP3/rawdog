@@ -58,10 +58,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('today')
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-lg mx-auto bg-gray-50 min-h-screen relative">
+    <div className="min-h-screen bg-gray-950">
+      <div className="max-w-lg mx-auto bg-gray-900 min-h-screen relative">
 
-        {/* Main scrollable content — padded to clear the fixed nav */}
         <main className="min-h-screen pb-20 overflow-y-auto">
           {activeTab === 'today' && <TodayView />}
           {activeTab === 'food'  && <FoodLog />}
@@ -69,9 +68,8 @@ export default function App() {
           {activeTab === 'plan'  && <PlanView />}
         </main>
 
-        {/* Bottom navigation — fixed, centered, max-w-lg */}
         <nav
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white border-t border-gray-200 z-10"
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-gray-900 border-t border-gray-800 z-10"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
           <div className="flex">
@@ -81,8 +79,8 @@ export default function App() {
                 onClick={() => setActiveTab(id)}
                 className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-xs font-medium transition-colors duration-150 ${
                   activeTab === id
-                    ? 'text-emerald-600'
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'text-emerald-400'
+                    : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
                 <Icon />

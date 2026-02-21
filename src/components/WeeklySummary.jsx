@@ -6,9 +6,9 @@ const DAY_ABBREV   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const MONTH_ABBREV = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 const TYPE_BADGE = {
-  workout: 'text-emerald-600',
-  walk:    'text-violet-500',
-  rest:    'text-gray-400',
+  workout: 'text-emerald-400',
+  walk:    'text-violet-400',
+  rest:    'text-gray-500',
 }
 
 export default function WeeklySummary() {
@@ -68,7 +68,6 @@ export default function WeeklySummary() {
     weekStart.getMonth() !== weekEnd.getMonth() ? MONTH_ABBREV[weekEnd.getMonth()] + ' ' : ''
   }${weekEnd.getDate()}`
 
-  // Tally overall week completion for the header
   const totalPossible  = weekDates.reduce((acc, d) => acc + getDayPlan(d).items.length, 0)
   const totalCompleted = weekDates.reduce((acc, d) => {
     const ds   = formatLocalDate(d)
@@ -82,10 +81,10 @@ export default function WeeklySummary() {
 
       {/* Header */}
       <div className="pt-4">
-        <h1 className="text-2xl font-bold text-gray-900">This Week</h1>
-        <p className="text-gray-400 text-sm mt-0.5">{weekLabel}</p>
+        <h1 className="text-2xl font-bold text-gray-100">This Week</h1>
+        <p className="text-gray-500 text-sm mt-0.5">{weekLabel}</p>
         {!loading && (
-          <p className="text-gray-500 text-sm mt-2 font-medium">
+          <p className="text-gray-400 text-sm mt-2 font-medium">
             {totalCompleted} / {totalPossible} items completed
           </p>
         )}
@@ -95,7 +94,7 @@ export default function WeeklySummary() {
       {loading ? (
         <div className="space-y-3">
           {[1,2,3,4,5,6,7].map(i => (
-            <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse" />
+            <div key={i} className="h-20 bg-gray-700 rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -115,21 +114,21 @@ export default function WeeklySummary() {
             return (
               <div
                 key={dateStr}
-                className={`bg-white rounded-xl border-2 p-4 transition-opacity ${
-                  isToday ? 'border-emerald-300' : 'border-gray-100'
-                } ${isFuture ? 'opacity-35' : ''}`}
+                className={`bg-gray-800 rounded-xl border-2 p-4 transition-opacity ${
+                  isToday ? 'border-emerald-700' : 'border-gray-700'
+                } ${isFuture ? 'opacity-30' : ''}`}
               >
                 <div className="flex items-center gap-3">
 
                   {/* Day number */}
                   <div className="w-11 text-center flex-shrink-0">
                     <div className={`text-xs font-semibold uppercase tracking-wide ${
-                      isToday ? 'text-emerald-500' : 'text-gray-400'
+                      isToday ? 'text-emerald-400' : 'text-gray-500'
                     }`}>
                       {DAY_ABBREV[i]}
                     </div>
                     <div className={`text-xl font-bold leading-tight ${
-                      isToday ? 'text-emerald-600' : 'text-gray-800'
+                      isToday ? 'text-emerald-400' : 'text-gray-200'
                     }`}>
                       {date.getDate()}
                     </div>
@@ -141,15 +140,15 @@ export default function WeeklySummary() {
                       <span className={`text-sm font-medium ${TYPE_BADGE[dayPlan.type]}`}>
                         {dayPlan.type.charAt(0).toUpperCase() + dayPlan.type.slice(1)}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         {!isFuture && `${completedCount}/${totalItems}`}
-                        {allDone && <span className="text-emerald-500 font-semibold ml-1">✓</span>}
+                        {allDone && <span className="text-emerald-400 font-semibold ml-1">✓</span>}
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-300 ${
-                          allDone ? 'bg-emerald-500' : pct > 0 ? 'bg-emerald-300' : ''
+                          allDone ? 'bg-emerald-500' : pct > 0 ? 'bg-emerald-700' : ''
                         }`}
                         style={{ width: `${isFuture ? 0 : pct}%` }}
                       />
@@ -175,13 +174,13 @@ export default function WeeklySummary() {
 
       {/* Legend */}
       {!loading && (
-        <div className="flex items-center gap-5 justify-center text-xs text-gray-400 pb-2">
+        <div className="flex items-center gap-5 justify-center text-xs text-gray-600 pb-2">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
             All done
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-300 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-emerald-700 inline-block" />
             Partial
           </span>
           <span className="flex items-center gap-1">🥗 Food logged</span>

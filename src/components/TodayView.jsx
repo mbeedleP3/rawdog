@@ -12,16 +12,16 @@ const CATEGORY_LABEL = {
 }
 
 const CATEGORY_COLOR = {
-  habit:   'text-blue-500',
-  workout: 'text-emerald-600',
-  walk:    'text-violet-500',
+  habit:   'text-blue-400',
+  workout: 'text-emerald-400',
+  walk:    'text-violet-400',
 }
 
 function CheckCircle({ checked, popping }) {
   return (
     <div
       className={`w-7 h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-        checked ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 bg-white'
+        checked ? 'bg-emerald-500 border-emerald-500' : 'border-gray-600 bg-gray-700'
       } ${popping ? 'check-pop' : ''}`}
     >
       {checked && (
@@ -43,9 +43,9 @@ export default function TodayView() {
   const dayPlan  = getDayPlan(today)
 
   const [completions, setCompletions] = useState(new Set())
-  const [popping,     setPopping]     = useState(null)   // item key currently animating
+  const [popping,     setPopping]     = useState(null)
   const [loading,     setLoading]     = useState(true)
-  const [saving,      setSaving]      = useState(new Set()) // keys currently being saved
+  const [saving,      setSaving]      = useState(new Set())
 
   useEffect(() => {
     supabase
@@ -64,7 +64,6 @@ export default function TodayView() {
 
     const wasChecked = completions.has(itemKey)
 
-    // Optimistic UI update
     setCompletions(prev => {
       const next = new Set(prev)
       wasChecked ? next.delete(itemKey) : next.add(itemKey)
@@ -72,7 +71,6 @@ export default function TodayView() {
     })
 
     if (!wasChecked) {
-      // Trigger pop animation
       setPopping(itemKey)
       setTimeout(() => setPopping(null), 300)
     }
@@ -94,7 +92,6 @@ export default function TodayView() {
 
     if (error) {
       console.error('Error toggling completion:', error)
-      // Revert optimistic update on failure
       setCompletions(prev => {
         const next = new Set(prev)
         wasChecked ? next.add(itemKey) : next.delete(itemKey)
@@ -125,30 +122,30 @@ export default function TodayView() {
 
       {/* Header */}
       <div className="pt-4">
-        <p className="text-sm font-medium text-gray-400">
+        <p className="text-sm font-medium text-gray-500">
           {DAY_NAMES[today.getDay()]}, {MONTH_NAMES[today.getMonth()]} {today.getDate()}
         </p>
-        <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{dayTypeLabel}</h1>
+        <h1 className="text-2xl font-bold text-gray-100 mt-0.5">{dayTypeLabel}</h1>
       </div>
 
       {/* Progress bar */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-sm font-medium">
-          <span className={allDone ? 'text-emerald-600' : 'text-gray-500'}>
+          <span className={allDone ? 'text-emerald-400' : 'text-gray-400'}>
             {allDone ? 'All done!' : `${completedItems} of ${totalItems} done`}
           </span>
-          <span className="text-gray-400">{Math.round(progress * 100)}%</span>
+          <span className="text-gray-600">{Math.round(progress * 100)}%</span>
         </div>
-        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ease-out ${
-              allDone ? 'bg-emerald-500' : 'bg-emerald-400'
+              allDone ? 'bg-emerald-500' : 'bg-emerald-600'
             }`}
             style={{ width: `${progress * 100}%` }}
           />
         </div>
         {allDone && (
-          <p className="text-center text-emerald-600 font-semibold text-sm pt-1 animate-bounce">
+          <p className="text-center text-emerald-400 font-semibold text-sm pt-1 animate-bounce">
             Crushed it today, Mark! 🎉
           </p>
         )}
@@ -158,7 +155,7 @@ export default function TodayView() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+            <div key={i} className="h-16 bg-gray-700 rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -172,19 +169,19 @@ export default function TodayView() {
                 disabled={saving.has(item.key)}
                 className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200 active:scale-95 ${
                   checked
-                    ? 'bg-emerald-50 border-emerald-200'
-                    : 'bg-white border-gray-100 hover:border-gray-200'
-                } ${saving.has(item.key) ? 'opacity-60' : ''}`}
+                    ? 'bg-emerald-900/20 border-emerald-800'
+                    : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                } ${saving.has(item.key) ? 'opacity-50' : ''}`}
               >
                 <CheckCircle checked={checked} popping={popping === item.key} />
 
                 <div className="flex-1 min-w-0">
                   <span className={`font-medium block transition-all duration-200 ${
-                    checked ? 'text-gray-400 line-through' : 'text-gray-800'
+                    checked ? 'text-gray-600 line-through' : 'text-gray-100'
                   }`}>
                     {item.label}
                   </span>
-                  <span className={`text-xs mt-0.5 block ${CATEGORY_COLOR[item.category] || 'text-gray-400'}`}>
+                  <span className={`text-xs mt-0.5 block ${CATEGORY_COLOR[item.category] || 'text-gray-500'}`}>
                     {CATEGORY_LABEL[item.category]}
                   </span>
                 </div>

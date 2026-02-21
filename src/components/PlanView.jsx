@@ -5,21 +5,21 @@ const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 
 const TYPE_STYLE = {
   workout: {
-    border: 'border-emerald-200',
-    bg:     'bg-emerald-50',
-    badge:  'bg-emerald-100 text-emerald-700',
+    border: 'border-emerald-800',
+    bg:     'bg-emerald-900/20',
+    badge:  'bg-emerald-900/50 text-emerald-400',
     label:  'Workout',
   },
   walk: {
-    border: 'border-violet-200',
-    bg:     'bg-violet-50',
-    badge:  'bg-violet-100 text-violet-700',
+    border: 'border-violet-800',
+    bg:     'bg-violet-900/20',
+    badge:  'bg-violet-900/50 text-violet-400',
     label:  'Walk',
   },
   rest: {
-    border: 'border-gray-200',
-    bg:     'bg-gray-50',
-    badge:  'bg-gray-100 text-gray-500',
+    border: 'border-gray-700',
+    bg:     'bg-gray-800',
+    badge:  'bg-gray-700 text-gray-400',
     label:  'Rest',
   },
 }
@@ -42,14 +42,14 @@ export default function PlanView() {
 
       {/* Header */}
       <div className="pt-4">
-        <h1 className="text-2xl font-bold text-gray-900">Week One Plan</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Your current weekly program</p>
+        <h1 className="text-2xl font-bold text-gray-100">Week One Plan</h1>
+        <p className="text-gray-500 text-sm mt-0.5">Your current weekly program</p>
       </div>
 
       {/* Legend */}
       <div className="flex gap-4 flex-wrap">
         {LEGEND.map(({ dot, label }) => (
-          <div key={label} className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div key={label} className="flex items-center gap-1.5 text-xs text-gray-400">
             <span className={`w-2 h-2 rounded-full ${dot} inline-block`} />
             {label}
           </div>
@@ -67,20 +67,18 @@ export default function PlanView() {
               key={dayKey}
               className={`rounded-xl border-2 ${style.border} ${style.bg} p-4`}
             >
-              {/* Card header */}
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-bold text-gray-900">{DAY_NAMES[i]}</h2>
+                <h2 className="font-bold text-gray-100">{DAY_NAMES[i]}</h2>
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${style.badge}`}>
                   {style.label}
                 </span>
               </div>
 
-              {/* Items */}
               <ul className="space-y-2">
                 {plan.items.map((item) => (
-                  <li key={item.key} className="flex items-start gap-2.5 text-sm text-gray-700">
+                  <li key={item.key} className="flex items-start gap-2.5 text-sm text-gray-300">
                     <span className={`w-1.5 h-1.5 rounded-full mt-[5px] flex-shrink-0 ${
-                      CATEGORY_DOT[item.category] || 'bg-gray-400'
+                      CATEGORY_DOT[item.category] || 'bg-gray-500'
                     }`} />
                     {item.label}
                   </li>
