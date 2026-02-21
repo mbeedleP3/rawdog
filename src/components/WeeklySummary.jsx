@@ -21,11 +21,10 @@ export default function WeeklySummary() {
   const startDate  = formatLocalDate(weekDates[0])
   const endDate    = formatLocalDate(weekDates[6])
 
-  const [completionsByDate, setCompletionsByDate] = useState({})
-  const [foodByDate,        setFoodByDate]        = useState({})
-  const [loading,           setLoading]           = useState(true)
-  const [copied,            setCopied]            = useState(false)
-  const [copying,           setCopying]           = useState(false)
+  const [completionsByDate,  setCompletionsByDate]  = useState({})
+  const [foodEntriesByDate,  setFoodEntriesByDate]  = useState({}) // date → [entry_text, ...]
+  const [loading,            setLoading]            = useState(true)
+  const [copied,             setCopied]             = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -38,9 +37,10 @@ export default function WeeklySummary() {
             .lte('date', endDate),
           supabase
             .from('food_log')
-            .select('date')
+            .select('date, entry_text')  // load full text upfront
             .gte('date', startDate)
-            .lte('date', endDate),
+            .lte('date', endDate)
+            .order('logged_at'),
         ])
 
       if (compErr) console.error('Error loading completions:', compErr)
@@ -57,9 +57,10 @@ export default function WeeklySummary() {
       else {
         const grouped = {}
         for (const row of foodData) {
-          grouped[row.date] = (grouped[row.date] || 0) + 1
+          if (!grouped[row.date]) grouped[row.date] = []
+          grouped[row.date].push(row.entry_text)
         }
-        setFoodByDate(grouped)
+        setFoodEntriesByDate(grouped)
       }
 
       setLoading(false)
@@ -81,24 +82,8 @@ export default function WeeklySummary() {
     return acc + plan.items.filter(item => done.has(item.key)).length
   }, 0)
 
-  const handleCopyCheckin = async () => {
-    setCopying(true)
-    try {
-
-    // Fetch food entries with full text for the week
-    const { data: foodEntries } = await supabase
-      .from('food_log')
-      .select('date, entry_text')
-      .gte('date', startDate)
-      .lte('date', endDate)
-      .order('logged_at')
-
-    const foodEntriesByDate = {}
-    for (const row of (foodEntries || [])) {
-      if (!foodEntriesByDate[row.date]) foodEntriesByDate[row.date] = []
-      foodEntriesByDate[row.date].push(row.entry_text)
-    }
-
+  // Synchronous — no awaits before the clipboard write, so iOS keeps the gesture context
+  const handleCopyCheckin = () => {
     const lines = [
       'Raw Dog — Weekly Check-in',
       weekLabel,
@@ -153,36 +138,29 @@ export default function WeeklySummary() {
     lines.push(`Checklist:     ${itemsDone} / ${itemsTotal} items`)
 
     const text = lines.join('\n')
-    let success = false
-    try {
-      await navigator.clipboard.writeText(text)
-      success = true
-    } catch {
-      // Fallback for iOS Safari when clipboard API is unavailable
-      try {
-        const el = document.createElement('textarea')
-        el.value = text
-        el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;'
-        document.body.appendChild(el)
-        el.focus()
-        el.select()
-        success = document.execCommand('copy')
-        document.body.removeChild(el)
-      } catch {
-        success = false
-      }
-    }
 
-    setCopying(false)
-    if (success) {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
-    }
-
-    } catch (err) {
-      console.error('Check-in copy failed:', err)
-      setCopying(false)
-    }
+    // Call writeText synchronously inside the tap handler — iOS requires this
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2500)
+      })
+      .catch(() => {
+        // Fallback for older iOS
+        try {
+          const el = document.createElement('textarea')
+          el.value = text
+          el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;'
+          document.body.appendChild(el)
+          el.focus()
+          el.select()
+          if (document.execCommand('copy')) {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2500)
+          }
+          document.body.removeChild(el)
+        } catch { /* silent */ }
+      })
   }
 
   return (
@@ -203,14 +181,13 @@ export default function WeeklySummary() {
       {!loading && (
         <button
           onClick={handleCopyCheckin}
-          disabled={copying}
-          className={`w-full py-3 rounded-xl border-2 text-sm font-medium transition-all duration-150 active:scale-95 disabled:opacity-50 ${
+          className={`w-full py-3 rounded-xl border-2 text-sm font-medium transition-all duration-150 active:scale-95 ${
             copied
               ? 'border-emerald-700 bg-emerald-900/20 text-emerald-400'
               : 'border-gray-700 bg-gray-800 hover:border-gray-600 text-gray-300'
           }`}
         >
-          {copied ? '✓ Copied to clipboard' : copying ? 'Copying…' : 'Copy Check-in Summary'}
+          {copied ? '✓ Copied to clipboard' : 'Copy Check-in Summary'}
         </button>
       )}
 
@@ -232,7 +209,7 @@ export default function WeeklySummary() {
             const completedCount = dayPlan.items.filter(item => completedKeys.has(item.key)).length
             const totalItems     = dayPlan.items.length
             const allDone        = completedCount === totalItems && !isFuture
-            const hasFoodEntry   = (foodByDate[dateStr] || 0) > 0
+            const hasFoodEntry   = (foodEntriesByDate[dateStr] || []).length > 0
             const pct            = totalItems > 0 ? (completedCount / totalItems) * 100 : 0
 
             return (
