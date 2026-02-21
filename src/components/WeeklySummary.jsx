@@ -4,6 +4,7 @@ import { usePlan } from '../contexts/PlanContext'
 import { getWeekDates, formatLocalDate } from '../data/weekOnePlan'
 
 const DAY_ABBREV   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const DAY_NAMES    = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const MONTH_ABBREV = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 const TYPE_BADGE = {
@@ -23,6 +24,8 @@ export default function WeeklySummary() {
   const [completionsByDate, setCompletionsByDate] = useState({})
   const [foodByDate,        setFoodByDate]        = useState({})
   const [loading,           setLoading]           = useState(true)
+  const [copied,            setCopied]            = useState(false)
+  const [copying,           setCopying]           = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -78,6 +81,82 @@ export default function WeeklySummary() {
     return acc + plan.items.filter(item => done.has(item.key)).length
   }, 0)
 
+  const handleCopyCheckin = async () => {
+    setCopying(true)
+
+    // Fetch food entries with full text for the week
+    const { data: foodEntries } = await supabase
+      .from('food_log')
+      .select('date, entry_text')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('logged_at')
+
+    const foodEntriesByDate = {}
+    for (const row of (foodEntries || [])) {
+      if (!foodEntriesByDate[row.date]) foodEntriesByDate[row.date] = []
+      foodEntriesByDate[row.date].push(row.entry_text)
+    }
+
+    const lines = [
+      'Raw Dog — Weekly Check-in',
+      weekLabel,
+      '',
+    ]
+
+    let workoutDone = 0, workoutTotal = 0
+    let walkDone    = 0, walkTotal    = 0
+    let foodDays    = 0
+    let itemsDone   = 0, itemsTotal   = 0
+    const pastDates = weekDates.filter(d => formatLocalDate(d) <= todayStr)
+
+    for (let i = 0; i < weekDates.length; i++) {
+      const date    = weekDates[i]
+      const dateStr = formatLocalDate(date)
+      if (dateStr > todayStr) continue
+
+      const dayPlan        = getDayPlan(date)
+      const completedKeys  = completionsByDate[dateStr] || new Set()
+      const completedCount = dayPlan.items.filter(item => completedKeys.has(item.key)).length
+      const allDone        = completedCount === dayPlan.items.length
+      const typeLabel      = { workout: 'Workout Day', walk: 'Walk Day', rest: 'Rest Day' }[dayPlan.type]
+
+      lines.push(`${DAY_NAMES[i]}, ${MONTH_ABBREV[date.getMonth()]} ${date.getDate()} — ${typeLabel}`)
+      lines.push(`${completedCount} / ${dayPlan.items.length} items`)
+
+      for (const item of dayPlan.items) {
+        lines.push(`  ${completedKeys.has(item.key) ? '✓' : '–'} ${item.label}`)
+      }
+
+      const entries = foodEntriesByDate[dateStr] || []
+      if (entries.length > 0) {
+        lines.push(`  Food: ${entries.join(' | ')}`)
+        foodDays++
+      } else {
+        lines.push(`  No food logged`)
+      }
+
+      lines.push('')
+
+      itemsDone  += completedCount
+      itemsTotal += dayPlan.items.length
+      if (dayPlan.type === 'workout') { workoutTotal++; if (allDone) workoutDone++ }
+      if (dayPlan.type === 'walk')    { walkTotal++;    if (allDone) walkDone++    }
+    }
+
+    lines.push('─────────────────────────')
+    lines.push('Totals')
+    lines.push(`Workout days:  ${workoutDone} / ${workoutTotal} completed`)
+    lines.push(`Walk days:     ${walkDone} / ${walkTotal} completed`)
+    lines.push(`Food logged:   ${foodDays} / ${pastDates.length} days`)
+    lines.push(`Checklist:     ${itemsDone} / ${itemsTotal} items`)
+
+    await navigator.clipboard.writeText(lines.join('\n'))
+    setCopying(false)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
+
   return (
     <div className="p-4 space-y-5">
 
@@ -91,6 +170,21 @@ export default function WeeklySummary() {
           </p>
         )}
       </div>
+
+      {/* Check-in export button */}
+      {!loading && (
+        <button
+          onClick={handleCopyCheckin}
+          disabled={copying}
+          className={`w-full py-3 rounded-xl border-2 text-sm font-medium transition-all duration-150 active:scale-95 disabled:opacity-50 ${
+            copied
+              ? 'border-emerald-700 bg-emerald-900/20 text-emerald-400'
+              : 'border-gray-700 bg-gray-800 hover:border-gray-600 text-gray-300'
+          }`}
+        >
+          {copied ? '✓ Copied to clipboard' : copying ? 'Copying…' : 'Copy Check-in Summary'}
+        </button>
+      )}
 
       {/* Day cards */}
       {loading ? (
