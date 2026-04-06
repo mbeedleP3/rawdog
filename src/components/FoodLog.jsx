@@ -10,10 +10,11 @@ export default function FoodLog() {
   const today    = new Date()
   const todayStr = formatLocalDate(today)
 
-  const [entries,    setEntries]    = useState([])
-  const [inputText,  setInputText]  = useState('')
-  const [loading,    setLoading]    = useState(true)
-  const [submitting, setSubmitting] = useState(false)
+  const [entries,       setEntries]       = useState([])
+  const [inputText,     setInputText]     = useState('')
+  const [loading,       setLoading]       = useState(true)
+  const [submitting,    setSubmitting]    = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(null)
   const textareaRef = useRef(null)
 
   useEffect(() => {
@@ -51,6 +52,20 @@ export default function FoodLog() {
     }
 
     setSubmitting(false)
+  }
+
+  const handleDelete = async (id) => {
+    if (confirmDelete !== id) {
+      setConfirmDelete(id)
+      return
+    }
+    const { error } = await supabase.from('food_log').delete().eq('id', id)
+    if (error) {
+      console.error('Error deleting food entry:', error)
+    } else {
+      setEntries(prev => prev.filter(e => e.id !== id))
+    }
+    setConfirmDelete(null)
   }
 
   const handleKeyDown = (e) => {
@@ -113,7 +128,20 @@ export default function FoodLog() {
                 key={entry.id}
                 className={`bg-gray-800 rounded-xl border border-gray-700 p-4 ${i === 0 ? 'slide-in' : ''}`}
               >
-                <p className="text-gray-100 text-base leading-relaxed">{entry.entry_text}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-gray-100 text-base leading-relaxed">{entry.entry_text}</p>
+                  <button
+                    onClick={() => handleDelete(entry.id)}
+                    onBlur={() => setConfirmDelete(null)}
+                    className={`flex-shrink-0 text-xs px-2 py-1 rounded-lg transition-colors ${
+                      confirmDelete === entry.id
+                        ? 'bg-red-600 text-white'
+                        : 'text-gray-600 hover:text-red-400'
+                    }`}
+                  >
+                    {confirmDelete === entry.id ? 'Confirm?' : '✕'}
+                  </button>
+                </div>
                 <p className="text-gray-600 text-xs mt-2">{formatTime(entry.logged_at)}</p>
               </div>
             ))}
