@@ -24,6 +24,17 @@ const TYPE_STYLE = {
   },
 }
 
+const DEFAULT_TYPE_STYLE = {
+  border: 'border-gray-600',
+  bg:     'bg-gray-800/50',
+  badge:  'bg-gray-700 text-gray-300',
+}
+
+function getTypeStyle(type) {
+  if (TYPE_STYLE[type]) return TYPE_STYLE[type]
+  return { ...DEFAULT_TYPE_STYLE, label: type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Unknown' }
+}
+
 const CATEGORY_DOT = {
   habit:   'bg-blue-400',
   workout: 'bg-emerald-500',
@@ -62,7 +73,7 @@ export default function PlanView() {
       <div className="space-y-3 pb-4">
         {DAY_KEYS.map((dayKey, i) => {
           const plan  = weeklyPlan[dayKey]
-          const style = TYPE_STYLE[plan.type]
+          const style = getTypeStyle(plan.type)
 
           return (
             <div
