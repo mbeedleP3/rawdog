@@ -1,70 +1,26 @@
-// Week One — hardcoded plan.
-// Future iterations can load this from the weekly_plan table in Supabase.
+// Recovery plan — post-surgery phase.
+// Loaded from Supabase `plans` table; this serves as the hardcoded fallback.
+
+const RECOVERY_ITEMS = [
+  { key: 'protein_shake', label: 'Morning protein shake',  category: 'habit'    },
+  { key: 'bible_reading', label: 'Bible reading',          category: 'recovery' },
+  { key: 'book_reading',  label: 'Book reading',           category: 'recovery' },
+  { key: 'moment_of_joy', label: 'Find a moment of joy',   category: 'recovery', hasNotes: true },
+  { key: 'hydration',     label: 'Drink enough water',     category: 'recovery' },
+  { key: 'miralax_am',    label: 'Miralax (morning)',      category: 'recovery' },
+  { key: 'miralax_pm',    label: 'Miralax (evening)',      category: 'recovery' },
+]
+
+const RECOVERY_DAY = { type: 'recovery', label: 'Recovery Day', items: RECOVERY_ITEMS }
 
 export const WEEKLY_PLAN = {
-  monday: {
-    type: 'workout',
-    label: 'Workout Day',
-    items: [
-      { key: 'protein_shake',      label: 'Morning protein shake',               category: 'habit'   },
-      { key: 'wall_pushups',       label: 'Wall push-ups — 3 × 10',              category: 'workout' },
-      { key: 'bodyweight_squats',  label: 'Bodyweight squats — 3 × 15',          category: 'workout' },
-      { key: 'band_rows',          label: 'Resistance band rows — 3 × 12',       category: 'workout' },
-      { key: 'dead_bug',           label: 'Dead bug — 3 × 8 per side',           category: 'workout' },
-    ],
-  },
-  tuesday: {
-    type: 'walk',
-    label: 'Walk Day',
-    items: [
-      { key: 'protein_shake', label: 'Morning protein shake',         category: 'habit' },
-      { key: 'walk',          label: 'Go for a walk (any distance)',  category: 'walk'  },
-    ],
-  },
-  wednesday: {
-    type: 'workout',
-    label: 'Workout Day',
-    items: [
-      { key: 'protein_shake',      label: 'Morning protein shake',               category: 'habit'   },
-      { key: 'wall_pushups',       label: 'Wall push-ups — 3 × 10',              category: 'workout' },
-      { key: 'bodyweight_squats',  label: 'Bodyweight squats — 3 × 15',          category: 'workout' },
-      { key: 'band_rows',          label: 'Resistance band rows — 3 × 12',       category: 'workout' },
-      { key: 'dead_bug',           label: 'Dead bug — 3 × 8 per side',           category: 'workout' },
-    ],
-  },
-  thursday: {
-    type: 'walk',
-    label: 'Walk Day',
-    items: [
-      { key: 'protein_shake', label: 'Morning protein shake',         category: 'habit' },
-      { key: 'walk',          label: 'Go for a walk (any distance)',  category: 'walk'  },
-    ],
-  },
-  friday: {
-    type: 'workout',
-    label: 'Workout Day',
-    items: [
-      { key: 'protein_shake',      label: 'Morning protein shake',               category: 'habit'   },
-      { key: 'wall_pushups',       label: 'Wall push-ups — 3 × 10',              category: 'workout' },
-      { key: 'bodyweight_squats',  label: 'Bodyweight squats — 3 × 15',          category: 'workout' },
-      { key: 'band_rows',          label: 'Resistance band rows — 3 × 12',       category: 'workout' },
-      { key: 'dead_bug',           label: 'Dead bug — 3 × 8 per side',           category: 'workout' },
-    ],
-  },
-  saturday: {
-    type: 'rest',
-    label: 'Rest Day',
-    items: [
-      { key: 'protein_shake', label: 'Morning protein shake', category: 'habit' },
-    ],
-  },
-  sunday: {
-    type: 'rest',
-    label: 'Rest Day',
-    items: [
-      { key: 'protein_shake', label: 'Morning protein shake', category: 'habit' },
-    ],
-  },
+  monday:    RECOVERY_DAY,
+  tuesday:   RECOVERY_DAY,
+  wednesday: RECOVERY_DAY,
+  thursday:  RECOVERY_DAY,
+  friday:    RECOVERY_DAY,
+  saturday:  RECOVERY_DAY,
+  sunday:    RECOVERY_DAY,
 }
 
 const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']

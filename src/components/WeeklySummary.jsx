@@ -8,9 +8,10 @@ const DAY_NAMES    = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'S
 const MONTH_ABBREV = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 const TYPE_BADGE = {
-  workout: 'text-emerald-400',
-  walk:    'text-violet-400',
-  rest:    'text-gray-500',
+  workout:  'text-emerald-400',
+  walk:     'text-violet-400',
+  rest:     'text-gray-500',
+  recovery: 'text-amber-400',
 }
 
 export default function WeeklySummary() {
@@ -22,6 +23,7 @@ export default function WeeklySummary() {
   const endDate    = formatLocalDate(weekDates[6])
 
   const [completionsByDate,  setCompletionsByDate]  = useState({})
+  const [notesByDate,        setNotesByDate]        = useState({}) // date → { itemKey → noteText }
   const [foodEntriesByDate,  setFoodEntriesByDate]  = useState({}) // date → [entry_text, ...]
   const [loading,            setLoading]            = useState(true)
   const [copied,             setCopied]             = useState(false)
@@ -32,7 +34,7 @@ export default function WeeklySummary() {
         await Promise.all([
           supabase
             .from('checklist_completions')
-            .select('date, item_key')
+            .select('date, item_key, notes')
             .gte('date', startDate)
             .lte('date', endDate),
           supabase
@@ -46,11 +48,17 @@ export default function WeeklySummary() {
       if (compErr) console.error('Error loading completions:', compErr)
       else {
         const grouped = {}
+        const notesGrouped = {}
         for (const row of compData) {
           if (!grouped[row.date]) grouped[row.date] = new Set()
           grouped[row.date].add(row.item_key)
+          if (row.notes) {
+            if (!notesGrouped[row.date]) notesGrouped[row.date] = {}
+            notesGrouped[row.date][row.item_key] = row.notes
+          }
         }
         setCompletionsByDate(grouped)
+        setNotesByDate(notesGrouped)
       }
 
       if (foodErr) console.error('Error loading food log:', foodErr)
@@ -110,8 +118,11 @@ export default function WeeklySummary() {
       lines.push(`${DAY_NAMES[i]}, ${MONTH_ABBREV[date.getMonth()]} ${date.getDate()} — ${typeLabel}`)
       lines.push(`${completedCount} / ${dayPlan.items.length} items`)
 
+      const dayNotes = notesByDate[dateStr] || {}
       for (const item of dayPlan.items) {
-        lines.push(`  ${completedKeys.has(item.key) ? '✓' : '–'} ${item.label}`)
+        const note = dayNotes[item.key]
+        const noteSuffix = note ? ` — "${note}"` : ''
+        lines.push(`  ${completedKeys.has(item.key) ? '✓' : '–'} ${item.label}${noteSuffix}`)
       }
 
       const entries = foodEntriesByDate[dateStr] || []

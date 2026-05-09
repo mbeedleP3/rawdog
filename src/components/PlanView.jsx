@@ -22,6 +22,12 @@ const TYPE_STYLE = {
     badge:  'bg-gray-700 text-gray-400',
     label:  'Rest',
   },
+  recovery: {
+    border: 'border-amber-800',
+    bg:     'bg-amber-900/20',
+    badge:  'bg-amber-900/50 text-amber-400',
+    label:  'Recovery',
+  },
 }
 
 const DEFAULT_TYPE_STYLE = {
@@ -36,15 +42,15 @@ function getTypeStyle(type) {
 }
 
 const CATEGORY_DOT = {
-  habit:   'bg-blue-400',
-  workout: 'bg-emerald-500',
-  walk:    'bg-violet-500',
+  habit:    'bg-blue-400',
+  workout:  'bg-emerald-500',
+  walk:     'bg-violet-500',
+  recovery: 'bg-amber-400',
 }
 
 const LEGEND = [
   { dot: 'bg-blue-400',    label: 'Daily habit' },
-  { dot: 'bg-emerald-500', label: 'Workout'     },
-  { dot: 'bg-violet-500',  label: 'Walk'        },
+  { dot: 'bg-amber-400',   label: 'Recovery'    },
 ]
 
 export default function PlanView() {

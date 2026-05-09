@@ -7,15 +7,17 @@ const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 const CATEGORY_LABEL = {
-  habit:   'Daily habit',
-  workout: 'Workout',
-  walk:    'Walk',
+  habit:    'Daily habit',
+  workout:  'Workout',
+  walk:     'Walk',
+  recovery: 'Recovery',
 }
 
 const CATEGORY_COLOR = {
-  habit:   'text-blue-400',
-  workout: 'text-emerald-400',
-  walk:    'text-violet-400',
+  habit:    'text-blue-400',
+  workout:  'text-emerald-400',
+  walk:     'text-violet-400',
+  recovery: 'text-amber-400',
 }
 
 function CheckCircle({ checked, popping }) {
@@ -45,6 +47,7 @@ export default function TodayView() {
   const dayPlan  = getDayPlan(today)
 
   const [completions, setCompletions] = useState(new Set())
+  const [notes,       setNotes]       = useState({})
   const [popping,     setPopping]     = useState(null)
   const [loading,     setLoading]     = useState(true)
   const [saving,      setSaving]      = useState(new Set())
@@ -52,11 +55,20 @@ export default function TodayView() {
   useEffect(() => {
     supabase
       .from('checklist_completions')
-      .select('item_key')
+      .select('item_key, notes')
       .eq('date', todayStr)
       .then(({ data, error }) => {
         if (error) console.error('Error loading completions:', error)
-        else setCompletions(new Set((data || []).map(r => r.item_key)))
+        else {
+          const keys = new Set()
+          const notesMap = {}
+          for (const r of (data || [])) {
+            keys.add(r.item_key)
+            if (r.notes) notesMap[r.item_key] = r.notes
+          }
+          setCompletions(keys)
+          setNotes(notesMap)
+        }
         setLoading(false)
       })
   }, [todayStr])
@@ -108,15 +120,23 @@ export default function TodayView() {
     })
   }
 
+  const saveNote = async (itemKey, text) => {
+    const { error } = await supabase
+      .from('checklist_completions')
+      .upsert({ date: todayStr, item_key: itemKey, notes: text || null }, { onConflict: 'date,item_key' })
+    if (error) console.error('Error saving note:', error)
+  }
+
   const totalItems     = dayPlan.items.length
   const completedItems = dayPlan.items.filter(item => completions.has(item.key)).length
   const progress       = totalItems > 0 ? completedItems / totalItems : 0
   const allDone        = completedItems === totalItems && totalItems > 0
 
   const dayTypeLabel = {
-    workout: 'Workout Day',
-    walk:    'Walk Day',
-    rest:    'Rest Day',
+    workout:  'Workout Day',
+    walk:     'Walk Day',
+    rest:     'Rest Day',
+    recovery: 'Recovery Day',
   }[dayPlan.type]
 
   return (
@@ -163,31 +183,50 @@ export default function TodayView() {
       ) : (
         <div className="space-y-3">
           {dayPlan.items.map((item) => {
-            const checked = completions.has(item.key)
+            const checked          = completions.has(item.key)
+            const notesVisible     = item.hasNotes && checked
+
             return (
-              <button
+              <div
                 key={item.key}
-                onClick={() => toggleItem(item.key)}
-                disabled={saving.has(item.key)}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200 active:scale-95 ${
+                className={`rounded-xl border-2 overflow-hidden transition-all duration-200 ${
                   checked
                     ? 'bg-emerald-900/20 border-emerald-800'
                     : 'bg-gray-800 border-gray-700 hover:border-gray-600'
                 } ${saving.has(item.key) ? 'opacity-50' : ''}`}
               >
-                <CheckCircle checked={checked} popping={popping === item.key} />
+                <button
+                  onClick={() => toggleItem(item.key)}
+                  disabled={saving.has(item.key)}
+                  className="w-full flex items-center gap-4 p-4 text-left active:scale-95"
+                >
+                  <CheckCircle checked={checked} popping={popping === item.key} />
 
-                <div className="flex-1 min-w-0">
-                  <span className={`font-medium block transition-all duration-200 ${
-                    checked ? 'text-gray-600 line-through' : 'text-gray-100'
-                  }`}>
-                    {item.label}
-                  </span>
-                  <span className={`text-xs mt-0.5 block ${CATEGORY_COLOR[item.category] || 'text-gray-500'}`}>
-                    {CATEGORY_LABEL[item.category]}
-                  </span>
-                </div>
-              </button>
+                  <div className="flex-1 min-w-0">
+                    <span className={`font-medium block transition-all duration-200 ${
+                      checked ? 'text-gray-600 line-through' : 'text-gray-100'
+                    }`}>
+                      {item.label}
+                    </span>
+                    <span className={`text-xs mt-0.5 block ${CATEGORY_COLOR[item.category] || 'text-gray-500'}`}>
+                      {CATEGORY_LABEL[item.category]}
+                    </span>
+                  </div>
+                </button>
+
+                {notesVisible && (
+                  <div className="px-4 pb-3">
+                    <textarea
+                      className="w-full bg-gray-800 text-gray-200 text-sm rounded-lg p-2.5 border border-gray-600 focus:border-amber-500 focus:outline-none resize-none placeholder-gray-600"
+                      rows={2}
+                      placeholder="What was the moment?"
+                      value={notes[item.key] || ''}
+                      onChange={e => setNotes(prev => ({ ...prev, [item.key]: e.target.value }))}
+                      onBlur={e => saveNote(item.key, e.target.value)}
+                    />
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>
