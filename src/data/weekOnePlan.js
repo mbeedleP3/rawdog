@@ -2,13 +2,13 @@
 // Loaded from Supabase `plans` table; this serves as the hardcoded fallback.
 
 const RECOVERY_ITEMS = [
-  { key: 'protein_shake', label: 'Morning protein shake',  category: 'habit'    },
-  { key: 'bible_reading', label: 'Bible reading',          category: 'recovery' },
-  { key: 'book_reading',  label: 'Book reading',           category: 'recovery' },
-  { key: 'moment_of_joy', label: 'Find a moment of joy',   category: 'recovery', hasNotes: true },
-  { key: 'hydration',     label: 'Drink enough water',     category: 'recovery' },
-  { key: 'miralax_am',    label: 'Miralax (morning)',      category: 'recovery' },
-  { key: 'miralax_pm',    label: 'Miralax (evening)',      category: 'recovery' },
+  { key: 'protein_shake', label: 'Morning protein shake', category: 'habit'    },
+  { key: 'walk_am',       label: 'Morning walk',          category: 'walk'     },
+  { key: 'walk_pm',       label: 'Evening walk',          category: 'walk'     },
+  { key: 'hydration',     label: 'Drink 64 oz of water',  category: 'recovery' },
+  { key: 'bible_reading', label: 'Bible reading',         category: 'recovery' },
+  { key: 'book_reading',  label: 'Book reading',          category: 'recovery' },
+  { key: 'moment_of_joy', label: 'Find a moment of joy',  category: 'recovery', hasNotes: true },
 ]
 
 const RECOVERY_DAY = { type: 'recovery', label: 'Recovery Day', items: RECOVERY_ITEMS }

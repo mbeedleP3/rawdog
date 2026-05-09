@@ -50,6 +50,7 @@ const CATEGORY_DOT = {
 
 const LEGEND = [
   { dot: 'bg-blue-400',    label: 'Daily habit' },
+  { dot: 'bg-violet-500',  label: 'Walk'        },
   { dot: 'bg-amber-400',   label: 'Recovery'    },
 ]
 
