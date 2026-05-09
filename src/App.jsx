@@ -14,12 +14,13 @@ function IconToday() {
   )
 }
 
-function IconFood() {
+function IconLog() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2" />
-      <path d="M7 2v20" />
-      <path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+      <rect x="9" y="3" width="6" height="4" rx="1" />
+      <line x1="9" y1="12" x2="15" y2="12" />
+      <line x1="9" y1="16" x2="13" y2="16" />
     </svg>
   )
 }
@@ -50,7 +51,7 @@ function IconPlan() {
 
 const TABS = [
   { id: 'today', label: 'Today',  Icon: IconToday },
-  { id: 'food',  label: 'Food',   Icon: IconFood  },
+  { id: 'food',  label: 'Log',    Icon: IconLog   },
   { id: 'week',  label: 'Week',   Icon: IconWeek  },
   { id: 'plan',  label: 'Plan',   Icon: IconPlan  },
 ]

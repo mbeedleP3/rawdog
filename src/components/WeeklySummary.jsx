@@ -39,7 +39,7 @@ export default function WeeklySummary() {
             .lte('date', endDate),
           supabase
             .from('food_log')
-            .select('date, entry_text')  // load full text upfront
+            .select('date, entry_text, category')
             .gte('date', startDate)
             .lte('date', endDate)
             .order('logged_at'),
@@ -61,12 +61,12 @@ export default function WeeklySummary() {
         setNotesByDate(notesGrouped)
       }
 
-      if (foodErr) console.error('Error loading food log:', foodErr)
+      if (foodErr) console.error('Error loading log:', foodErr)
       else {
         const grouped = {}
         for (const row of foodData) {
           if (!grouped[row.date]) grouped[row.date] = []
-          grouped[row.date].push(row.entry_text)
+          grouped[row.date].push({ text: row.entry_text, category: row.category || 'food' })
         }
         setFoodEntriesByDate(grouped)
       }
@@ -127,10 +127,18 @@ export default function WeeklySummary() {
 
       const entries = foodEntriesByDate[dateStr] || []
       if (entries.length > 0) {
-        lines.push(`  Food: ${entries.join(' | ')}`)
+        const byCategory = {}
+        for (const e of entries) {
+          if (!byCategory[e.category]) byCategory[e.category] = []
+          byCategory[e.category].push(e.text)
+        }
+        for (const [cat, texts] of Object.entries(byCategory)) {
+          const label = cat.charAt(0).toUpperCase() + cat.slice(1)
+          lines.push(`  ${label}: ${texts.join(' | ')}`)
+        }
         foodDays++
       } else {
-        lines.push(`  No food logged`)
+        lines.push(`  No log entries`)
       }
 
       lines.push('')
@@ -267,14 +275,14 @@ export default function WeeklySummary() {
                     </div>
                   </div>
 
-                  {/* Food indicator */}
+                  {/* Log indicator */}
                   <div
                     className={`w-7 text-center text-lg flex-shrink-0 transition-opacity ${
                       hasFoodEntry ? 'opacity-100' : 'opacity-15'
                     }`}
-                    title={hasFoodEntry ? 'Food logged' : 'No food logged'}
+                    title={hasFoodEntry ? 'Entries logged' : 'No entries logged'}
                   >
-                    🥗
+                    📋
                   </div>
 
                 </div>
@@ -295,7 +303,7 @@ export default function WeeklySummary() {
             <span className="w-2 h-2 rounded-full bg-emerald-700 inline-block" />
             Partial
           </span>
-          <span className="flex items-center gap-1">🥗 Food logged</span>
+          <span className="flex items-center gap-1">📋 Logged</span>
         </div>
       )}
 
