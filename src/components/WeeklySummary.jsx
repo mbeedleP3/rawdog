@@ -415,9 +415,11 @@ export default function WeeklySummary() {
                         <div className="space-y-2">
                           {Object.entries(entriesByCat).map(([cat, entries]) => (
                             <div key={cat} className="flex items-start gap-2">
-                              <span className={`inline-flex flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium mt-0.5 ${LOG_CHIP[cat] || 'bg-gray-600 text-white'}`}>
-                                {LOG_LABEL[cat] || cat}
-                              </span>
+                              <div className="w-24 flex-shrink-0 flex justify-end pt-0.5">
+                                <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${LOG_CHIP[cat] || 'bg-gray-600 text-white'}`}>
+                                  {LOG_LABEL[cat] || cat}
+                                </span>
+                              </div>
                               <div className="space-y-0.5 flex-1">
                                 {entries.map((entry, idx) => (
                                   <div key={idx} className="flex items-baseline justify-between gap-2">
