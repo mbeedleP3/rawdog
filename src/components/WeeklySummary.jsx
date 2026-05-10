@@ -399,7 +399,7 @@ export default function WeeklySummary() {
                                   {item.label}
                                 </span>
                                 {note && (
-                                  <p className="text-xs text-amber-400/80 mt-0.5 italic">"{note}"</p>
+                                  <p className="text-xs text-amber-400/80 mt-0.5 italic whitespace-pre-wrap">"{note}"</p>
                                 )}
                               </div>
                             </div>
