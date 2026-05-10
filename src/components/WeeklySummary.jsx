@@ -30,6 +30,10 @@ const LOG_LABEL = {
   medicine:  'Medicine',
 }
 
+function formatTime(ts) {
+  return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+}
+
 function ChevronDown() {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -86,7 +90,7 @@ export default function WeeklySummary() {
             .lte('date', endDate),
           supabase
             .from('food_log')
-            .select('date, entry_text, category')
+            .select('date, entry_text, category, logged_at')
             .gte('date', startDate)
             .lte('date', endDate)
             .order('logged_at'),
@@ -113,7 +117,7 @@ export default function WeeklySummary() {
         const grouped = {}
         for (const row of foodData) {
           if (!grouped[row.date]) grouped[row.date] = []
-          grouped[row.date].push({ text: row.entry_text, category: row.category || 'food' })
+          grouped[row.date].push({ text: row.entry_text, category: row.category || 'food', loggedAt: row.logged_at })
         }
         setFoodEntriesByDate(grouped)
       }
@@ -301,7 +305,7 @@ export default function WeeklySummary() {
             const logEntries     = foodEntriesByDate[dateStr] || []
             const entriesByCat   = logEntries.reduce((acc, e) => {
               if (!acc[e.category]) acc[e.category] = []
-              acc[e.category].push(e.text)
+              acc[e.category].push(e)
               return acc
             }, {})
 
@@ -409,14 +413,19 @@ export default function WeeklySummary() {
                       <div>
                         <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Log Entries</p>
                         <div className="space-y-2">
-                          {Object.entries(entriesByCat).map(([cat, texts]) => (
+                          {Object.entries(entriesByCat).map(([cat, entries]) => (
                             <div key={cat} className="flex items-start gap-2">
                               <span className={`inline-flex flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium mt-0.5 ${LOG_CHIP[cat] || 'bg-gray-600 text-white'}`}>
                                 {LOG_LABEL[cat] || cat}
                               </span>
-                              <div className="space-y-0.5">
-                                {texts.map((text, idx) => (
-                                  <p key={idx} className="text-sm text-gray-300 leading-relaxed">{text}</p>
+                              <div className="space-y-0.5 flex-1">
+                                {entries.map((entry, idx) => (
+                                  <div key={idx} className="flex items-baseline justify-between gap-2">
+                                    <p className="text-sm text-gray-300 leading-relaxed">{entry.text}</p>
+                                    {entry.loggedAt && (
+                                      <span className="text-xs text-gray-600 flex-shrink-0">{formatTime(entry.loggedAt)}</span>
+                                    )}
+                                  </div>
                                 ))}
                               </div>
                             </div>
